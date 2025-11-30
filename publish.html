@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Published Blog Post</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="publish-container">
+        <div class="publish-content">
+            <button id="backBtn" class="back-btn">← Back to Editor</button>
+            
+            <article class="published-post">
+                <header class="post-header">
+                    <h1 id="publishedTitle" class="post-title"></h1>
+                    <div class="post-meta">
+                        <span id="publishedDate" class="post-date"></span>
+                        <span class="separator">•</span>
+                        <span id="readingTime" class="reading-time"></span>
+                    </div>
+                </header>
+
+                <div id="coverImageContainer" class="cover-image-container" style="display: none;">
+                    <img id="publishedCoverImage" src="" alt="Cover image" class="cover-image" />
+                </div>
+
+                <div id="publishedContent" class="post-content"></div>
+            </article>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load and display published content
+        document.addEventListener('DOMContentLoaded', function() {
+            const title = localStorage.getItem('blogTitle') || 'Untitled Post';
+            const content = localStorage.getItem('blogContent') || '';
+            const coverImageUrl = localStorage.getItem('blogCoverImage') || '';
+            const theme = localStorage.getItem('blogTheme') || 'light';
+
+            // Apply theme
+            document.body.className = theme === 'dark' ? 'dark' : 'light';
+
+            // Set title
+            document.getElementById('publishedTitle').textContent = title;
+
+            // Set date
+            const date = new Date();
+            document.getElementById('publishedDate').textContent = date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Calculate reading time
+            const words = content.split(/\s+/).filter(word => word.length > 0).length;
+            const readingTime = Math.ceil(words / 200); // Average reading speed: 200 words per minute
+            document.getElementById('readingTime').textContent = `${readingTime > 0 ? readingTime : '< 1'} min read`;
+
+            // Set cover image
+            if (coverImageUrl && coverImageUrl.trim() !== '') {
+                const coverImageContainer = document.getElementById('coverImageContainer');
+                const coverImage = document.getElementById('publishedCoverImage');
+                coverImage.src = coverImageUrl;
+                coverImage.onerror = function() {
+                    coverImageContainer.style.display = 'none';
+                };
+                coverImageContainer.style.display = 'block';
+            }
+
+            // Render markdown content
+            const renderedContent = markdownToHtml(content);
+            document.getElementById('publishedContent').innerHTML = renderedContent;
+
+            // Back button
+            document.getElementById('backBtn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
